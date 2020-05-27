@@ -19,6 +19,7 @@ type (
 	LoggerConfig struct {
 		// Skipper defines a function to skip middleware.
 		Skipper Skipper
+		AfterSkipper Skipper
 
 		// Tags to construct the logger format.
 		//
@@ -68,6 +69,7 @@ var (
 	// DefaultLoggerConfig is the default Logger middleware config.
 	DefaultLoggerConfig = LoggerConfig{
 		Skipper: DefaultSkipper,
+		AfterSkipper: DefaultSkipper,
 		Format: `{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}",` +
 			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
 			`"status":${status},"error":"${error}","latency":${latency},"latency_human":"${latency_human}"` +
@@ -88,6 +90,9 @@ func LoggerWithConfig(config LoggerConfig) echo.MiddlewareFunc {
 	// Defaults
 	if config.Skipper == nil {
 		config.Skipper = DefaultLoggerConfig.Skipper
+	}
+	if config.AfterSkipper == nil {
+		config.AfterSkipper = DefaultLoggerConfig.Skipper
 	}
 	if config.Format == "" {
 		config.Format = DefaultLoggerConfig.Format
@@ -121,6 +126,10 @@ func LoggerWithConfig(config LoggerConfig) echo.MiddlewareFunc {
 			buf := config.pool.Get().(*bytes.Buffer)
 			buf.Reset()
 			defer config.pool.Put(buf)
+			
+			if config.AfterSkipper(c) {
+				return next(c)
+			}
 
 			if _, err = config.template.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
 				switch tag {
