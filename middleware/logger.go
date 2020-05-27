@@ -128,7 +128,7 @@ func LoggerWithConfig(config LoggerConfig) echo.MiddlewareFunc {
 			defer config.pool.Put(buf)
 
 			if config.AfterSkipper(c) {
-				return next(c)
+				return
 			}
 
 			if _, err = config.template.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
