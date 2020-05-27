@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/kineo2k/echo/v4"
 	"github.com/labstack/gommon/color"
 	"github.com/valyala/fasttemplate"
 )
@@ -126,7 +126,7 @@ func LoggerWithConfig(config LoggerConfig) echo.MiddlewareFunc {
 			buf := config.pool.Get().(*bytes.Buffer)
 			buf.Reset()
 			defer config.pool.Put(buf)
-			
+
 			if config.AfterSkipper(c) {
 				return next(c)
 			}

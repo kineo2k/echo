@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/labstack/echo/v4"
+	"github.com/kineo2k/echo/v4"
 	"github.com/labstack/gommon/random"
 )
 
